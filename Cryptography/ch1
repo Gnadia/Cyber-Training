@@ -1,0 +1,74 @@
+from pwn import *
+import base64
+import sys
+
+str = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
+raw = bytes.fromhex(str)
+b64 = base64.b64encode(raw)
+print(f"Challenge 1: ",b64)
+
+str1 = "1c0111001f010100061a024b53535009181c"
+str2 = "686974207468652062756c6c277320657965"
+hex1 = bytes.fromhex(str1)
+hex2 = bytes.fromhex(str2)
+xored = xor(hex1, hex2)
+print(f"Challenge 2: ", xored.hex())
+
+common = "ETAOIN SHRDLUetaoin shrdlu "
+compare = -1
+best_plaintext = None
+strr = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+text = bytes.fromhex(strr)
+for key in range(256):
+    decrypted = b''
+    for i in text:
+        decrypted += bytes(xor(i,key))
+    decryptedstr = decrypted.decode('latin-1')
+    score = 0 
+    for char in decryptedstr:
+        if char in common:
+            score += 1
+    if score > compare:
+        compare = score 
+        best_plaintext = decryptedstr
+print("Challenge 3: ", best_plaintext)
+    
+
+common4 = "ETAOIN SHRDLUetaoin shrdlu "
+compare4 = -1
+best_plaintext4 = None
+strings = []
+file = open('4.txt', 'r')
+for line in file:
+    text = bytes.fromhex(line)
+    for key in range(256):
+        decrypted4 = b''
+        for i in text:
+            decrypted4 += bytes(xor(i, key))
+        decryptedstr4 = decrypted4.decode('latin-1')
+        score = 0
+        for char in decryptedstr4:
+            if char in common4:
+                score += 1
+            if score > compare4:
+                compare4 = score
+                best_plaintext4 = decryptedstr4
+print("Challenge 4: ", best_plaintext4)
+
+
+
+to_encrypt = "Burning 'em, if you ain't quick and nimble I go crazy when I hear a cymbal"
+encrypted = b''
+count = -1
+key = "ICE"
+for i in to_encrypt:
+    count += 1
+    if count == 3:
+        count = 0
+    encrypted += bytes([ord(i) ^ ord(key[count])])
+print(encrypted.hex())
+
+
+
+        
+
